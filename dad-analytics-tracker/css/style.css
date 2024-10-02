@@ -1,0 +1,50 @@
+
+.widefat {
+        border-collapse: collapse;
+        width: 100%;
+    }
+.widefat th, .widefat td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+.widefat th {
+        background-color: #f1f1f1;
+    }
+
+.tablenav {
+        margin: 20px 0; /* Add some margin to the top and bottom */
+    }
+    
+.tablenav-pages {
+        display: flex; /* Use flexbox to center items */
+        justify-content: center; /* Center the pagination links */
+        flex-wrap: wrap; /* Allow wrapping if necessary */
+    }
+    
+.page-numbers {
+        background: #0073aa; /* WordPress primary color */
+        color: #fff; /* White text color */
+        padding: 8px 12px; /* Padding around the text */
+        margin: 0 5px; /* Spacing between numbers */
+        border-radius: 4px; /* Rounded corners */
+        text-decoration: none; /* Remove underline from links */
+        transition: 0.3s; /* Smooth transition for hover effect */
+    }
+    
+.page-numbers.current {
+        background: #005177; /* Darker color for the current page */
+    }
+    
+.page-numbers:hover {
+        background: #0096d6; /* Lighten color on hover */
+    }
+    
+    /* Optional: Add a style for disabled pages */
+.page-numbers.disabled {
+        background: #e0e0e0; /* Gray background for disabled */
+        color: #a0a0a0; /* Gray text for disabled */
+        pointer-events: none; /* Prevent interaction */
+    }
+    
+
