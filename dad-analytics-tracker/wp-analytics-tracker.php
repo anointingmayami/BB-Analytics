@@ -50,7 +50,6 @@ function wp_analytics_enqueue_admin_styles() {
 }
 add_action('admin_enqueue_scripts', 'wp_analytics_enqueue_admin_styles');
 
-
 // Add AJAX handler for tracking page loads
 function wp_analytics_track_page_load() {
     global $wpdb;
@@ -151,16 +150,8 @@ function wp_analytics_display_dashboard() {
     global $wpdb;
     $table_name = $wpdb->prefix . 'analytics_data';
 
-    // Check if the analytics data table exists
-    if ($wpdb->get_var("SHOW TABLES LIKE '$table_name'") != $table_name) {
-        add_action('admin_notices', function() {
-            echo '<div class="error"><p>Error: The analytics data table does not exist. Please ensure the plugin is properly activated.</p></div>';
-        });
-        return;
-    }
-
     // Pagination setup
-    $limit = 10; // Number of results per page
+    $limit = 10; // Results per page
     $page = isset($_GET['paged']) ? (int) $_GET['paged'] : 1;
     $offset = ($page - 1) * $limit;
 
@@ -175,34 +166,45 @@ function wp_analytics_display_dashboard() {
     echo '<h1>The Business Builders Analytics - Dashboard</h1>';
     echo '<p>Empowering businesses through actionable insights with simplicity and security.</p>';
 
-    if ($results) {
-        // Search Form
-        echo '<form method="get" action="">';
-        echo '<input type="hidden" name="page" value="bb-analytics-tracker">';
-        echo '<input type="text" name="search" placeholder="Search Links..." />';
-        echo '<input type="submit" value="Search" class="button">';
-        echo '</form>';
+    // Display search form
+    echo '<form method="get" action="">';
+    echo '<input type="hidden" name="page" value="bb-analytics-tracker">';
+    echo '<input type="text" name="search" placeholder="Search Links..." />';
+    echo '<input type="submit" value="Search" class="button">';
+    echo '</form>';
 
+    // CSV Export Button
+    echo '<button id="export_csv_button" class="button-primary" style="margin-top: 18px;">Export Data to CSV</button>';
+
+    if ($results) {
         // Display top-ranking links
         echo '<h2>Top Ranking Links</h2>';
         echo '<table class="widefat fixed">';
-        echo '<thead><tr><th>Link URL</th><th>Page View</th><th>Page Time</th></tr></thead>';
+        echo '<thead><tr><th>Link URL</th><th>Page Views</th><th>Time Spent (seconds)</th></tr></thead>';
         echo '<tbody>';
         foreach ($results as $row) {
-            echo '<tr><td>' . esc_html($row->link_url) . '</td><td>' . esc_html($row->click_count) . '</td><td>' . esc_html($row->time_spent) . ' Seconds' . '</td></tr>';
+            echo '<tr>';
+            echo '<td>' . esc_html($row->link_url) . '</td>';
+            echo '<td>' . esc_html($row->click_count) . '</td>';
+            echo '<td>' . esc_html($row->time_spent) . ' Seconds</td>';
+            echo '</tr>';
         }
         echo '</tbody></table>';
 
-        // Pagination Controls
-        echo '<div class="tablenav"><div class="tablenav-pages" style="text-align: center;">';
+        // Centered Pagination Controls
+        echo '<div class="tablenav">';
+        echo '<div class="tablenav-pages" style="text-align: center;">';
         for ($i = 1; $i <= $total_pages; $i++) {
-            echo '<a class="page-numbers' . ($i === $page ? ' current' : '') . '" href="?page=bb-analytics-tracker&paged=' . $i . '">' . $i . '</a> ';
+            $current = $i === $page ? ' current' : '';
+            echo '<a class="page-numbers' . $current . '" href="?page=bb-analytics-tracker&paged=' . $i . '">' . $i . '</a> ';
         }
-        echo '</div></div>'; // Close tablenav and tablenav-pages
+        echo '</div></div>';
     } else {
         echo '<p>No data available yet. Start by getting some traffic!</p>';
     }
+
     echo '</div>';
+
 }
 
 // Register settings on admin init
