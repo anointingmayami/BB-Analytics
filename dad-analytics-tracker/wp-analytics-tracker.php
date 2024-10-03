@@ -8,7 +8,6 @@ Author: The Business Builders
 Author URI: https://thebusinessbuilders.org/
 License: GPLv2 or later
 */
-
 // Security: Prevent direct access to the file
 if (!defined('ABSPATH')) {
     exit;
@@ -16,6 +15,19 @@ if (!defined('ABSPATH')) {
 
 // Include analytics functions
 require_once(plugin_dir_path(__FILE__) . 'inc/analytics-functions.php');
+require_once(plugin_dir_path(__FILE__) . 'inc/analytics-export-functions.php');
+
+function wp_analytics_enqueue_scripts() {
+    // Enqueue the JavaScript file
+    wp_enqueue_script('wp-analytics-js', plugin_dir_url(__FILE__) . 'js/export-analytics.js', array('jquery'), null, true);
+    
+    // Localize script with an array
+    wp_localize_script('wp-analytics-js', 'ajax_object', array(
+        'ajax_url' => admin_url('admin-ajax.php') // Pass the AJAX URL to JavaScript
+    ));
+}
+add_action('admin_enqueue_scripts', 'wp_analytics_enqueue_scripts');
+
 
 // Hook to trigger plugin activation
 register_activation_hook(__FILE__, 'wp_analytics_activation');
