@@ -1,6 +1,6 @@
 <?php
 /*
-Plugin Name: DAD Analytics Tracker
+Plugin Name: BB Analytics Tracker
 Plugin URI: https://github.com/anointingmayami/DAD
 Description: A plugin to track and rank the most popular links on your WordPress site.
 Version: 1.0
@@ -286,13 +286,4 @@ function sync() {
     // You can add conditions based on your requirements
         sync_top_links_with_flask_api(); // Trigger sync immediately after update
 }
-
-// Function to add favicon to the plugin pages
-// function the_builder_analytics_favicon() {
-//     // Assuming the favicon is stored in 'assets' folder within your plugin
-//     echo '<link rel="icon" href="' . plugin_dir_url(__FILE__) . 'assets/img/favicon.ico" type="image/x-icon">';
-// }
-// // Hook into wp_head action to add the favicon globally across all admin and frontend
-// add_action('wp_head', 'the_builder_analytics_favicon');
-// add_action('admin_head', 'the_builder_analytics_favicon');
 
