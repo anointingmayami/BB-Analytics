@@ -180,6 +180,7 @@ function wp_analytics_display_dashboard() {
     $results = $wpdb->get_results($wpdb->prepare("SELECT * FROM $table_name ORDER BY click_count DESC LIMIT %d OFFSET %d", $limit, $offset));
 
     echo '<div class="wrap">';
+    
     echo '<h1>The Business Builders Analytics - Dashboard</h1>';
     echo '<p>Empowering businesses through actionable insights with simplicity and security.</p>';
 
@@ -285,3 +286,13 @@ function sync() {
     // You can add conditions based on your requirements
         sync_top_links_with_flask_api(); // Trigger sync immediately after update
 }
+
+// Function to add favicon to the plugin pages
+// function the_builder_analytics_favicon() {
+//     // Assuming the favicon is stored in 'assets' folder within your plugin
+//     echo '<link rel="icon" href="' . plugin_dir_url(__FILE__) . 'assets/img/favicon.ico" type="image/x-icon">';
+// }
+// // Hook into wp_head action to add the favicon globally across all admin and frontend
+// add_action('wp_head', 'the_builder_analytics_favicon');
+// add_action('admin_head', 'the_builder_analytics_favicon');
+
