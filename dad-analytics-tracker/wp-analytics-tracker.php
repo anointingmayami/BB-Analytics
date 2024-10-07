@@ -16,6 +16,10 @@ if (!defined('ABSPATH')) {
 // Include analytics functions
 require_once(plugin_dir_path(__FILE__) . 'inc/analytics-functions.php');
 require_once(plugin_dir_path(__FILE__) . 'inc/analytics-export-functions.php');
+require_once(plugin_dir_path(__FILE__) . 'inc/export-analytics-api.php');
+
+require_once(plugin_dir_path(__FILE__) . 'inc/php-jwt-main/src/JWT.php');
+require_once(plugin_dir_path(__FILE__) . 'inc/php-jwt-main/src/Key.php');
 
 function wp_analytics_enqueue_scripts() {
     // Enqueue the JavaScript file
@@ -27,7 +31,6 @@ function wp_analytics_enqueue_scripts() {
     ));
 }
 add_action('admin_enqueue_scripts', 'wp_analytics_enqueue_scripts');
-
 
 // Hook to trigger plugin activation
 register_activation_hook(__FILE__, 'wp_analytics_activation');
@@ -87,6 +90,7 @@ function wp_analytics_track_page_load() {
             array('click_count' => $existing_link->click_count + 1),
             array('link_url' => $page_url)
         );
+        sync();
     } else {
         // If the link doesn't exist, insert a new row with a page load count of 1
         $wpdb->insert(
@@ -96,6 +100,7 @@ function wp_analytics_track_page_load() {
                 'click_count' => 1
             )
         );
+        sync();
     }
 
     // Send a success response back to the JavaScript
@@ -178,6 +183,8 @@ function wp_analytics_display_dashboard() {
     echo '<h1>The Business Builders Analytics - Dashboard</h1>';
     echo '<p>Empowering businesses through actionable insights with simplicity and security.</p>';
 
+    wp_analytics_display_sync_status();
+
     // Display search form
     echo '<form method="get" action="">';
     echo '<input type="hidden" name="page" value="bb-analytics-tracker">';
@@ -259,4 +266,22 @@ function wp_analytics_settings_page() {
         <p>We respect your privacy. All data collected is encrypted and stored securely. You can control how long your data is kept.</p>
     </div>
     <?php
+}
+
+// Function to display the sync status in the dashboard widget
+function wp_analytics_display_sync_status() {
+    // Get the last sync status and time from the options table
+    $last_sync_status = get_option('wp_analytics_last_sync_status', 'Never Synced');
+    $last_sync_time = get_option('wp_analytics_last_sync_time', 'Never');
+
+    echo '<h4>Last Sync Status: ' . esc_html($last_sync_status) . '</h4>';
+    echo '<p>Last Sync Time: ' . esc_html($last_sync_time) . '</p>';
+}
+
+function sync() {
+    // Ensure it is not an auto-save and check for post type
+    if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
+    
+    // You can add conditions based on your requirements
+        sync_top_links_with_flask_api(); // Trigger sync immediately after update
 }
