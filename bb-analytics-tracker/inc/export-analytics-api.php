@@ -45,7 +45,7 @@ function sync_top_links_with_flask_api() {
         echo $data;
 
         // Send the data to Flask API
-        $response = wp_remote_post('http://127.0.0.1:5000/analytics/sync', array(
+        $response = wp_remote_post('https://thebusinessbuilders.org/datacenter.io/analytics/sync', array(
             'body'    => json_encode($data),
             'headers' => array('Content-Type' => 'application/json'),
         ));
