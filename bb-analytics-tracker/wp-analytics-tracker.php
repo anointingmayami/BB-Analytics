@@ -71,6 +71,7 @@ function wp_analytics_track_page_load() {
 
     // Get the current page URL
     $page_url = isset($_POST['page_url']) ? sanitize_text_field($_POST['page_url']) : '';
+    $time_spent = isset($_POST['time_spent']) ? (int) $_POST['time_spent'] : 0;
 
     // Validate the page URL
     if (empty($page_url)) {
@@ -82,12 +83,15 @@ function wp_analytics_track_page_load() {
 
     // Check if the URL already exists in the database
     $existing_link = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_name WHERE link_url = %s", $page_url));
-
+    // $existing_link = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_name WHERE link_url = %s", $page_url));
+    
     if ($existing_link) {
         // If the link exists, increment the page load count
         $wpdb->update(
             $table_name,
-            array('click_count' => $existing_link->click_count + 1),
+            array('click_count' => $existing_link->click_count + 1,
+            'time_spent' => $existing_link->time_spent + $time_spent
+        ),
             array('link_url' => $page_url)
         );
         sync();
@@ -97,7 +101,8 @@ function wp_analytics_track_page_load() {
             $table_name,
             array(
                 'link_url' => $page_url,
-                'click_count' => 1
+                'click_count' => 1,
+                'time_spent' => $time_spent
             )
         );
         sync();
@@ -110,35 +115,8 @@ function wp_analytics_track_page_load() {
 // Hook the function to the AJAX action for both logged-in and non-logged-in users
 add_action('wp_ajax_track_page_load', 'wp_analytics_track_page_load');
 add_action('wp_ajax_nopriv_track_page_load', 'wp_analytics_track_page_load');
-
-// Add AJAX handler for tracking time spent on the page
-function wp_analytics_track_time_spent() {
-    global $wpdb;
-
-    // Get the page URL and time spent from the AJAX request
-    $page_url = isset($_POST['page_url']) ? sanitize_text_field($_POST['page_url']) : '';
-    $time_spent = isset($_POST['time_spent']) ? (int) $_POST['time_spent'] : 0;
-
-    // Validate the data
-    if (empty($page_url) || $time_spent <= 0) {
-        wp_send_json_error('Invalid data.');
-    }
-
-    // Define the analytics table name
-    $table_name = $wpdb->prefix . 'analytics_data';
-
-    // Update the time spent for the page URL in the database (you can create a new column for this if needed)
-    $wpdb->update(
-        $table_name,
-        array('time_spent' => $time_spent), // Assuming you add a `time_spent` column to your table
-        array('link_url' => $page_url)
-    );
-
-    // Send a success response
-    wp_send_json_success('Time spent tracked successfully.');
-}
-add_action('wp_ajax_track_time_spent', 'wp_analytics_track_time_spent');
-add_action('wp_ajax_nopriv_track_time_spent', 'wp_analytics_track_time_spent');
+add_action('wp_ajax_track_time_spent', 'wp_analytics_track_page_load');
+add_action('wp_ajax_nopriv_track_time_spent', 'wp_analytics_track_page_load');
 
 // Add admin menu for the analytics dashboard
 function wp_analytics_add_admin_menu() {
