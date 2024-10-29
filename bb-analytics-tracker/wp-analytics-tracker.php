@@ -181,10 +181,14 @@ function wp_analytics_display_dashboard() {
         echo '<thead><tr><th>Link URL</th><th>Page Views</th><th>Time Spent (seconds)</th></tr></thead>';
         echo '<tbody>';
         foreach ($results as $row) {
+            // Assuming $row->time_spent contains the time in seconds
+            $seconds = (int) $row->time_spent;
+            $timeFormatted = gmdate("H:i:s", $seconds);
+
             echo '<tr>';
             echo '<td>' . esc_html($row->link_url) . '</td>';
             echo '<td>' . esc_html($row->click_count) . '</td>';
-            echo '<td>' . esc_html($row->time_spent) . ' Seconds</td>';
+            echo '<td>' . esc_html($timeFormatted) . '</td>';
             echo '</tr>';
         }
         echo '</tbody></table>';
@@ -192,11 +196,22 @@ function wp_analytics_display_dashboard() {
         // Centered Pagination Controls
         echo '<div class="tablenav">';
         echo '<div class="tablenav-pages" style="text-align: center;">';
-        for ($i = 1; $i <= $total_pages; $i++) {
-            $current = $i === $page ? ' current' : '';
-            echo '<a class="page-numbers' . $current . '" href="?page=bb-analytics-tracker&paged=' . $i . '">' . $i . '</a> ';
+
+        // Previous Button
+        if ($page > 1) {
+            echo '<a class="page-numbers prev" href="?page=bb-analytics-tracker&paged=' . ($page - 1) . '">Previous</a> ';
         }
+
+        // Current Page Indicator with total pages
+        echo '<span class="page-numbers current">Page ' . $page . ' of ' . $total_pages . '</span>';
+
+        // Next Button
+        if ($page < $total_pages) {
+            echo '<a class="page-numbers next" href="?page=bb-analytics-tracker&paged=' . ($page + 1) . '">Next</a>';
+        }
+
         echo '</div></div>';
+
     } else {
         echo '<p>No data available yet. Start by getting some traffic!</p>';
     }
